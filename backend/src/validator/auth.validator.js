@@ -9,9 +9,9 @@ function validateRequest(req, res, next) {
 }
 
 export const validateRegisterUser = [
-    body("username")
+    body("fullname")
         .isLength({ min: 3 })
-        .withMessage("Username must be at least 3 characters long"),
+        .withMessage("Full name must be at least 3 characters long"),
     body("email")
         .isEmail()
         .withMessage("Please provide a valid email"),
@@ -26,8 +26,20 @@ export const validateRegisterUser = [
         .matches(/^[0-9]{10}$/)
         .withMessage("Contact number must be exactly 10 numeric characters long"),
     body("isSeller")
+        .optional()
         .isBoolean()
         .withMessage("isSeller must be a boolean value"),
         
     validateRequest
 ];
+
+        export const validateLoginUser = [
+            body("email")
+                .isEmail()
+                .withMessage("Please provide a valid email"),
+            body("password")
+                .notEmpty()
+                .withMessage("Password is required"),
+
+            validateRequest
+        ];

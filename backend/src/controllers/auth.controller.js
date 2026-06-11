@@ -7,19 +7,25 @@ async function sendTokenResponse(user, res) {
         expiresIn: "7d",
     });
 
-    res.cookie("token", token);
+    res.cookie("token", token, {
+        httpOnly: true,
+        sameSite: "lax",
+    });
 
-    res.status(200).json({ token });
+    return token;
 }
 
 export const register = async (req, res) => {
 
-    const { fullname, email, contact, password, role } = req.body;
+    const { fullname, email, contact, password, isSeller = false } = req.body;
 
     try {
-        const existingUser = await userModel.findOne({ email }, { contact });
+        const existingUser = await userModel.findOne({
+            $or: [{ email }, { contact }],
+        });
+
         if (existingUser) {
-            return res.status(400).json({ message: "Email already in use" });
+            return res.status(400).json({ message: "Email or contact already in use" });
         }
         const user = new userModel({
             fullname, 
@@ -28,11 +34,57 @@ export const register = async (req, res) => {
             password, 
             role: isSeller ? "seller" : "buyer"
         });
-        await sendTokenResponse(user, res);
+        await user.save();
+        const token = await sendTokenResponse(user, res);
 
-        res.status(201).json({ message: "User registered successfully" });
+        return res.status(201).json({
+            message: "User registered successfully",
+            token,
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                contact: user.contact,
+                role: user.role,
+            },
+        });
     } catch (error) {
         console.error("Error registering user:", error);
         return res.status(500).json({ message: "Error registering user" });
+    }
+};
+
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await userModel.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        const isPasswordValid = await user.comparePassword(password);
+
+        if (!isPasswordValid) {
+            return res.status(401).json({ message: "Invalid email or password" });
+        }
+
+        const token = await sendTokenResponse(user, res);
+
+        return res.status(200).json({
+            message: "User logged in successfully",
+            token,
+            user: {
+                id: user._id,
+                fullname: user.fullname,
+                email: user.email,
+                contact: user.contact,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        console.error("Error logging in user:", error);
+        return res.status(500).json({ message: "Error logging in user" });
     }
 };
