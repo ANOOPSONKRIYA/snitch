@@ -1,14 +1,15 @@
 import axios from "axios";
 
 const authApiInstace = axios.create({
-    baseURL: "http://localhost:3000/api/auth",
+    baseURL: "/api/auth",
     withCredentials: true,
 });
 
-export async function register({ email, password, fullname, contact, isSeller = false }){
+export async function register({ email, password, confirmPassword, fullname, contact, isSeller = false }){
     const response = await authApiInstace.post("/register", {  
         email,
         password,
+        confirmPassword,
         fullname,
         contact,
         isSeller

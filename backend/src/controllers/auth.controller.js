@@ -50,7 +50,10 @@ export const register = async (req, res) => {
         });
     } catch (error) {
         console.error("Error registering user:", error);
-        return res.status(500).json({ message: "Error registering user" });
+        return res.status(500).json({
+            message: "Error registering user",
+            error: process.env.NODE_ENV === "production" ? undefined : error.message,
+        });
     }
 };
 
@@ -85,6 +88,9 @@ export const login = async (req, res) => {
         });
     } catch (error) {
         console.error("Error logging in user:", error);
-        return res.status(500).json({ message: "Error logging in user" });
+        return res.status(500).json({
+            message: "Error logging in user",
+            error: process.env.NODE_ENV === "production" ? undefined : error.message,
+        });
     }
 };

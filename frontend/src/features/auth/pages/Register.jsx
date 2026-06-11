@@ -45,6 +45,7 @@ const Register = () => {
         contact: form.contact.trim(),
         email: form.email.trim(),
         password: form.password,
+        confirmPassword: form.confirmPassword,
         isSeller: form.isSeller,
       });
 

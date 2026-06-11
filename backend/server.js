@@ -6,10 +6,13 @@ const PORT = config.PORT || 3000;
 
 const startServer = async () => {
     try{
-        await connectDB();
+        const isConnected = await connectDB();
 
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
+            if (!isConnected) {
+                console.warn("MongoDB is not connected. Auth routes will return a service unavailable response until the database is reachable.");
+            }
         });
     } catch (error) {
         console.error("Error starting server:", error);
