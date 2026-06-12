@@ -1,6 +1,7 @@
 import { setError, setLoading, setUser } from "../state/auth.slice.js";
-import { login, register } from "../services/auth.api.js";
+import { getMe, login, register } from "../services/auth.api.js";
 import { useDispatch, useSelector } from "react-redux";
+import { useCallback } from "react";
 
 export const useAuth = () => {
     const dispatch = useDispatch();
@@ -11,7 +12,7 @@ export const useAuth = () => {
             dispatch(setLoading(true));
             dispatch(setError(null));
             const data = await register({email, password, confirmPassword, fullname, contact, isSeller });
-            dispatch(setUser(data));
+            dispatch(setUser(data.user || data));
             dispatch(setLoading(false));
             return data;
         } catch (error) {
@@ -26,7 +27,7 @@ export const useAuth = () => {
             dispatch(setLoading(true));
             dispatch(setError(null));
             const data = await login({ email, password });
-            dispatch(setUser(data));
+            dispatch(setUser(data.user || data));
             dispatch(setLoading(false));
             return data;
         } catch (error) {
@@ -36,5 +37,19 @@ export const useAuth = () => {
         }
     };
 
-    return { handleRegister, handleLogin, loading, error, user };
+    const syncCurrentSession = useCallback(async () => {
+        try {
+            dispatch(setLoading(true));
+            dispatch(setError(null));
+            const data = await getMe();
+            dispatch(setUser(data.user || data));
+            dispatch(setLoading(false));
+            return data;
+        } catch {
+            dispatch(setLoading(false));
+            return null;
+        }
+    }, [dispatch]);
+
+    return { handleRegister, handleLogin, syncCurrentSession, loading, error, user };
 };

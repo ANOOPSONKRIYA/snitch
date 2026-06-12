@@ -56,6 +56,10 @@ const Register = () => {
     }
   };
 
+  const handleGoogleAuth = () => {
+    window.location.assign("/api/auth/google");
+  };
+
   return (
     <main className="min-h-screen px-4 py-8 text-zinc-50 sm:px-6 lg:px-8">
       <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-md items-center justify-center">
@@ -71,6 +75,17 @@ const Register = () => {
           </CardHeader>
 
           <CardContent className="space-y-6 px-6 py-6 sm:px-8 sm:py-8">
+            <div className="space-y-3">
+              <Button type="button" variant="secondary" className="h-11 w-full" onClick={handleGoogleAuth}>
+                Continue with Google
+              </Button>
+              <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-zinc-500">
+                <span className="h-px flex-1 bg-white/10" />
+                or
+                <span className="h-px flex-1 bg-white/10" />
+              </div>
+            </div>
+
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-5">
                 <div className="space-y-2">

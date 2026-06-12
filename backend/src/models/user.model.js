@@ -13,11 +13,27 @@ const userSchema = new mongoose.Schema({
     },
     contact: {
         type: String,
-        required: true,
+        required() {
+            return this.authProvider === "local";
+        },
+        default: "",
     },
     password: {
         type: String,
-        required: true,
+        required() {
+            return this.authProvider === "local";
+        },
+        default: "",
+    },
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local",
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
     },
     role: {
         type: String,
@@ -27,7 +43,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 userSchema.pre("save", async function () {
-    if (!this.isModified("password")) {
+    if (this.authProvider !== "local" || !this.isModified("password") || !this.password) {
         return;
     }
 
@@ -36,6 +52,10 @@ userSchema.pre("save", async function () {
 });
 
 userSchema.methods.comparePassword = async function (candidatePassword) {
+    if (!this.password) {
+        return false;
+    }
+
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
