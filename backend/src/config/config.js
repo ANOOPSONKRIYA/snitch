@@ -26,6 +26,11 @@ if(!process.env.GOOGLE_CLIENT_SECRET) {
     process.exit(1);
 }
 
+if(!process.env.IMAGEKIT_PRIVATE_KEY) {
+    console.error("IMAGEKIT_PRIVATE_KEY is not defined in .env file");
+    process.exit(1);
+}
+
 export const config = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT,
@@ -35,4 +40,5 @@ export const config = {
     GOOGLE_CALLBACK_URL:
         process.env.GOOGLE_CALLBACK_URL || "http://localhost:3000/api/auth/google/callback",
     FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
+    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
 };
